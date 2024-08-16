@@ -1,0 +1,2 @@
+14:3:0 => first log message!
+14:3:0 => /data/zyh/MPRPC/example/Callee/friendservice.cc:main:43

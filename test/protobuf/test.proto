@@ -1,0 +1,60 @@
+// protobuf的配置文件
+syntax = "proto3";  // 声明了protobuf的版本
+
+package fixbug;  // 声明了代码所在的包(对于C++来说是namespace)
+
+// 定义下面的选项，表示生成service服务类和rpc方法描述，默认不生成
+option cc_generic_services = true;
+
+// 在test.pb.h里生成了class message 继承自public google::protobuf::message
+message ResultCode{
+    int32 errcode=1;
+    bytes errmsg=2;   // 在protobuf中string类型通常存为bytes
+}
+
+// 定义登录请求消息类型 name pwd
+message LoginRequest{
+    bytes name=1;  // 表示name是Loginrequest里的第一个字段
+    bytes pwd=2;  // 表示pwd是Loginrequest里的第二个字段
+}
+
+// 定义登录响应消息类型
+message LoginResponse{
+    ResultCode result=1;
+    bool success=2;
+}
+
+message GetFriendListsRequest{
+    uint32 userid=1;
+}
+
+message User{
+    bytes name=1;
+    uint32 age=2;
+    enum Sex{
+        MAN=0;
+        WOMAN=1;
+    }
+    Sex sex=3;
+}
+message GetFriendListsResponse{
+    ResultCode result=1;
+    repeated User friend_list=2;  // 定义了一个列表类型
+    //repeated 可以重复 表明friend_list可以有很多个
+}
+
+// 在protobuf里面怎么定义描述rpc方法的类型 - service
+/*在test.pb.h里生成了class service 继承自public google::protobuf::service
+用在callee ServiceProvider rpc服务提供者那一端*/
+
+service UserServiceRpc{
+
+    /*protobuf不支持rpc功能 它只是对rpc方法的一个描述 
+    通过这个描述它就可以去做rpc请求所携带的参数的序列化和反序列化*/
+
+    // 定义了一个Login的rpc方法 Login()中填它实参的protobuf的类型表示
+    rpc Login(LoginRequest) returns(LoginResponse);
+    rpc GetFriendLists(GetFriendListsRequest) returns(GetFriendListsResponse);
+}
+/* test.pb.h中还生成了一个UserServiceRpc_Stub类 该类是用于caller端 ServiceConsumer rpc消费者
+*/
